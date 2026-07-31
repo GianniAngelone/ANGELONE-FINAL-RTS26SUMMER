@@ -412,6 +412,106 @@ load_d  priority  2
   </div>
 </section>
 
+<!-- ========== FINAL REFLECTION ========== -->
+<section id="reflection">
+  <h2>Final Reflection</h2>
+
+  <p>
+    Going into Real-Time Systems, I already had experience with programming
+    and embedded systems, but I mostly thought about software in terms of
+    whether it worked or not. This class changed that way of thinking.
+  </p>
+
+  <h3>Looking Back</h3>
+  <p>
+    I learned that in a real-time system, <strong>when something happens
+    can be just as important as what happens</strong>. A system can produce
+    the correct result and still have a problem if the response takes too long.
+  </p>
+
+  <p>
+    That became much more obvious to me while working on my final project.
+    I built a tamper detection system where a button on the ESP32-S3 triggers
+    an interrupt. The interrupt then wakes two different bottom-half tasks.
+  </p>
+
+  <h3>What Was Harder Than Expected</h3>
+  <p>
+    The hardest part of the class for me was getting the systems to behave
+    consistently. A lot of the problems were not simple programming mistakes.
+    I had issues with task scheduling, interrupts, task priorities, stack sizes,
+    communication between tasks, and simulator behavior.
+  </p>
+
+  <p>
+    My final project was a good example of this. I eventually ran into
+    FreeRTOS crashes related to task notifications. I had to stop changing
+    random pieces of code and understand what the system was actually doing.
+    I learned that task notifications depend on valid task handles and that
+    initialization and task ownership matter in a concurrent system.
+  </p>
+
+  <h3>What I Would Do Differently</h3>
+  <p>
+    If I did the project again, I would spend more time planning the task
+    structure before writing the code. I tended to start coding and then fix
+    problems as they appeared.
+  </p>
+
+  <p>
+    I would also test smaller pieces of the system before combining everything
+    together. For example, I would verify the interrupt first, then the
+    semaphore path, then the notification path, and finally add the background
+    load.
+  </p>
+
+  <p>
+    I would also spend more time testing on actual hardware. Wokwi was extremely
+    useful, but a simulator does not behave exactly like a physical ESP32-S3.
+  </p>
+
+  <h3>Most Valuable Thing I Learned</h3>
+  <p>
+    The most valuable thing I learned is to think about an embedded program as
+    a <strong>system of activities competing for time and resources</strong>,
+    instead of just a list of instructions.
+  </p>
+
+  <p>
+    Before this class, I would mostly ask, "Does this work?" Now I am more
+    likely to ask what has the highest priority, what happens if two things
+    occur at the same time, how long a task can be delayed, and what happens
+    when the system is under load.
+  </p>
+
+  <h3>What I Will Take Into Future Work</h3>
+  <p>
+    I am interested in embedded and computer engineering, so I expect these
+    ideas to come up again in projects involving microcontrollers, robotics,
+    automation, and other hardware systems.
+  </p>
+
+  <p>
+    The biggest change for me is that I no longer think of timing as something
+    considered only after the program is finished. I see timing, scheduling,
+    and concurrency as part of the design itself.
+  </p>
+
+  <p>
+    Overall, this class gave me a better understanding of what is happening
+    underneath embedded software and gave me more confidence when debugging
+    systems that do not behave the way I expect.
+  </p>
+
+  <p>
+    <strong>
+      The biggest lesson I am taking away is simple: correctness is not only
+      about getting the right answer. In a real-time system, it is also about
+      getting that answer at the right time.
+    </strong>
+  </p>
+</section>  
+  
 </main>
 
 <footer>
