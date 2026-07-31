@@ -1,4 +1,4 @@
-# App 3 — Interrupts & Bottom-Half Pattern
+# Final Capstone for EEL 4775 Real-Time Systems
 
 Theme: Hardware Security
 
