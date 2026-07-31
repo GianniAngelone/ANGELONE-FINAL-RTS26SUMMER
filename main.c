@@ -216,11 +216,11 @@ static void btn_task_notif(void *arg)
 static volatile uint32_t hb_a, hb_b, hb_c, hb_d;
 static uint64_t wcet_a_max_us, wcet_b_max_us, wcet_c_max_us, wcet_d_max_us;
 
-#define MEASURE_WCET(_max_var, _body) do {                       
-    int64_t _t0 = esp_timer_get_time();                          
-    _body;                                                        
-    int64_t _dt = esp_timer_get_time() - _t0;                    
-    if ((uint64_t)_dt > (_max_var)) (_max_var) = (uint64_t)_dt;  
+#define MEASURE_WCET(_max_var, _body) do {                       \
+    int64_t _t0 = esp_timer_get_time();                          \
+    _body;                                                        \
+    int64_t _dt = esp_timer_get_time() - _t0;                    \
+    if ((uint64_t)_dt > (_max_var)) (_max_var) = (uint64_t)_dt;  \
 } while (0)
 
 /* ---- Load Task A  priority 15  period 10 ms : xorshift32 churn (integer) ---- */
@@ -327,10 +327,10 @@ static void start_background_load(void)
     /* Rate-monotonic ladder, all on Core 1, mirroring App 2. These priorities
      * are FIXED here (this is a load fixture). Note A=15 outranks your
      * bottom-half tasks (12); B/C/D do not. */
-    xTaskCreatePinnedToCore(load_task_a, "load_a", 2048, NULL, 15, NULL, APP_CPU_NUM);
-    xTaskCreatePinnedToCore(load_task_b, "load_b", 2048, NULL, 10, NULL, APP_CPU_NUM);
-    xTaskCreatePinnedToCore(load_task_c, "load_c", 2048, NULL,  5, NULL, APP_CPU_NUM);
-    xTaskCreatePinnedToCore(load_task_d, "load_d", 2048, NULL,  2, NULL, APP_CPU_NUM);
+    xTaskCreatePinnedToCore(load_task_a, "load_a", 4096, NULL, 15, NULL, APP_CPU_NUM);
+    xTaskCreatePinnedToCore(load_task_b, "load_b", 4096, NULL, 10, NULL, APP_CPU_NUM);
+    xTaskCreatePinnedToCore(load_task_c, "load_c", 4096, NULL,  5, NULL, APP_CPU_NUM);
+    xTaskCreatePinnedToCore(load_task_d, "load_d", 4096, NULL,  2, NULL, APP_CPU_NUM);
 }
 #endif /* WITH_LOAD */
 
