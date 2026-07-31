@@ -28,13 +28,6 @@ The App 2 load tasks are:
 
 Task A is the only load task with a higher priority than the bottom-half tasks. Task B, C, and D are lower priority, so they should not cut in front of the bottom-half tasks once the bottom-half tasks are ready.
 
-## What I Changed
-
-1. I changed the theme from `YOURTHEME` to `Hardware Security`.
-2. I changed the log messages to say `tamper event`.
-3. I increased the bottom-half task stack size from `2048` to `4096` because Wokwi gave me a stack overflow at first.
-4. I kept the ISR logic the same.
-
 ## Capturing Latency with Wokwi Logic Analyzer
 
 The logic analyzer was connected as:
