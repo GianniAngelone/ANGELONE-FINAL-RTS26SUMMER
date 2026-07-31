@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Hardware Security ISR Portfolio</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; line-height: 1.5; }
+    h1, h2 { color: #1a365d; }
+    img { max-width: 100%; }
+  </style>
+</head>
+<body>
+
+<h1>Hardware Security – Interrupt & Bottom-Half System</h1>
+
+<p><strong>Theme:</strong> Tamper detection using a button as a security sensor.</p>
+
+<p>
+  When the button (tamper sensor) is pressed, a fast interrupt runs.
+  The interrupt quickly signals two bottom-half tasks.
+  Those tasks measure how long it took to wake up and log the event.
+</p>
+
+<h2>Live Demo</h2>
+<p>
+  <a href="YOUR_WOKWI_LINK_HERE" target="_blank">Open Wokwi Project</a>
+</p>
+
+<h2>Demo Video</h2>
+<!-- Replace with your YouTube embed later -->
+<p>Video will be embedded here after upload.</p>
+
+<h2>System Architecture</h2>
+<pre>
+GPIO 18 (Tamper Button)
+        |
+        v
+   button_isr  (top-half)
+        |           |
+   semaphore     notification
+        |           |
+        v           v
+  btn_sem task   btn_notif task
+  (priority 12)  (priority 12)
+</pre>
+
+<h2>Task Table</h2>
+<table border="1" cellpadding="6">
+  <tr><th>Task</th><th>Priority</th><th>Role</th></tr>
+  <tr><td>btn_sem</td><td>12</td><td>Bottom-half (semaphore path)</td></tr>
+  <tr><td>btn_notif</td><td>12</td><td>Bottom-half (notification path)</td></tr>
+  <tr><td>load_a (when enabled)</td><td>15</td><td>Background load</td></tr>
+  <tr><td>load_b</td><td>10</td><td>Background load</td></tr>
+  <tr><td>load_c</td><td>5</td><td>Background load</td></tr>
+  <tr><td>load_d</td><td>2</td><td>Background load</td></tr>
+</table>
+
+<h2>Key Results</h2>
+<ul>
+  <li>Idle Notification max latency: ~30 µs</li>
+  <li>Idle Semaphore max latency: ~2300 µs</li>
+  <li>Under load both paths get slower (Task A at priority 15 causes the delay)</li>
+</ul>
+
+<h2>Full README</h2>
+<p><a href="README.md">View the full project README</a></p>
+
+</body>
+</html>
