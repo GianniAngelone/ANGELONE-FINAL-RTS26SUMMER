@@ -4,6 +4,10 @@ Theme: Hardware Security
 
 In my app, the button on GPIO 18 is treated like a tamper sensor. When the button is pressed, it triggers an interrupt. The ISR is the top half. It does the quick interrupt work, then wakes the bottom-half tasks. The bottom-half tasks do the slower work like printing the latency.
 
+## GitHub Pages Link
+
+https://gianniangelone.github.io/ANGELONE-FINAL-RTS26SUMMER/
+
 ## Wokwi Link
 
 https://wokwi.com/projects/468065854653295617
