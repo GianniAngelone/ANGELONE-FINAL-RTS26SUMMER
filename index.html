@@ -10,23 +10,24 @@
       font-family: 'Segoe UI', Arial, sans-serif;
       background: #0b1120;
       color: #e2e8f0;
-      line-height: 1.6;
+      line-height: 1.65;
     }
     header {
       background: linear-gradient(180deg, #0f172a 0%, #0b1120 100%);
       text-align: center;
-      padding: 60px 20px 40px;
+      padding: 55px 20px 35px;
       border-bottom: 2px solid #3b82f6;
     }
     header h1 {
-      font-size: 2.4rem;
+      font-size: 2.3rem;
       color: #f8fafc;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
     header p {
       color: #94a3b8;
-      max-width: 700px;
-      margin: 0 auto 20px;
+      max-width: 720px;
+      margin: 0 auto 18px;
+      font-size: 1.05rem;
     }
     .badge {
       display: inline-block;
@@ -48,31 +49,32 @@
     nav a {
       color: #94a3b8;
       text-decoration: none;
-      margin: 0 16px;
+      margin: 0 15px;
       font-size: 0.95rem;
     }
     nav a:hover { color: #60a5fa; }
     main {
-      max-width: 900px;
+      max-width: 920px;
       margin: 40px auto;
       padding: 0 20px;
     }
     section {
       background: #1e293b;
       border-radius: 12px;
-      padding: 28px;
+      padding: 30px;
       margin-bottom: 28px;
       border: 1px solid #334155;
     }
     h2 {
       color: #60a5fa;
       margin-bottom: 16px;
-      font-size: 1.4rem;
+      font-size: 1.35rem;
     }
-    p { margin-bottom: 12px; color: #cbd5e1; }
+    p { margin-bottom: 14px; color: #cbd5e1; }
+    ul { margin: 10px 0 14px 22px; color: #cbd5e1; }
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
       gap: 16px;
       margin-top: 20px;
     }
@@ -94,12 +96,13 @@
     }
     pre {
       background: #0f172a;
-      padding: 18px;
+      padding: 20px;
       border-radius: 8px;
       overflow-x: auto;
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       color: #e2e8f0;
       border: 1px solid #334155;
+      line-height: 1.45;
     }
     table {
       width: 100%;
@@ -120,13 +123,13 @@
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      margin-top: 16px;
+      margin-top: 18px;
     }
     .btn {
       background: #2563eb;
       color: white;
       text-decoration: none;
-      padding: 10px 20px;
+      padding: 11px 20px;
       border-radius: 8px;
       font-size: 0.95rem;
     }
@@ -145,10 +148,10 @@
   <h1>Hardware Security – Tamper Detection System</h1>
   <p>
     A FreeRTOS-based ESP32-S3 system that treats a button as a tamper sensor.
-    A fast interrupt signals two bottom-half tasks that measure wake-up latency
-    and log the security event.
+    A short interrupt signals two bottom-half tasks that measure wake-up latency
+    and log the security event under both idle and loaded conditions.
   </p>
-  <div class="badge">EEL 4775 Real-Time Systems Final Capstone</div>
+  <div class="badge">EEL 4775 Real-Time Systems · Final Capstone</div>
 </header>
 
 <nav>
@@ -162,152 +165,220 @@
 
 <main>
 
+  <!-- ========== PROJECT OVERVIEW (longer) ========== -->
   <section id="overview">
     <h2>Project Overview</h2>
     <p>
-      This project demonstrates the classic interrupt top-half / bottom-half pattern
-      on FreeRTOS. The button on GPIO 18 acts as a tamper sensor. When pressed, a
-      short ISR records the time and wakes two tasks. Those tasks measure how long
-      it took to wake up and print the result.
+      This project implements a hardware-security oriented interrupt system on the
+      ESP32-S3 using FreeRTOS. A push-button on GPIO 18 is treated as a tamper sensor.
+      When the button is pressed, a fast interrupt service routine (the top-half)
+      runs immediately. The ISR performs only the minimum work required: debouncing
+      the input, recording the entry timestamp, pulsing a diagnostic GPIO, and
+      signaling two bottom-half tasks.
     </p>
     <p>
-      The same system can run with or without background load so latency can be
-      compared in idle and loaded conditions.
+      The two bottom-half tasks are responsible for the slower work. One task is
+      woken by a binary semaphore; the other is woken by a direct task notification.
+      Both tasks calculate the latency from the moment the ISR started until the
+      task began running, then log the result. This design follows the classic
+      top-half / bottom-half pattern used in real embedded and operating-system
+      kernels.
     </p>
+    <p>
+      The system can be run in two modes. In idle mode only the interrupt path and
+      the two bottom-half tasks exist. In loaded mode, four additional background
+      tasks (carried forward from an earlier assignment) run on the same core and
+      create realistic scheduling contention. Comparing the two modes shows how
+      higher-priority work affects interrupt response time.
+    </p>
+    <p>
+      The project is relevant to embedded firmware, security, and safety-critical
+      roles. The same pattern appears in secure boot monitors, industrial emergency
+      stops, and any system that must react quickly to an external event while
+      keeping the interrupt handler itself very short.
+    </p>
+
     <div class="cards">
       <div class="card">
         <h3>Platform</h3>
-        <p>ESP32-S3 + FreeRTOS in Wokwi</p>
+        <p>ESP32-S3 + FreeRTOS<br>Simulated in Wokwi</p>
       </div>
       <div class="card">
         <h3>Interrupt Path</h3>
-        <p>GPIO ISR → semaphore + direct notification</p>
+        <p>GPIO ISR with debounce,<br>timestamp, and dual wake-up</p>
       </div>
       <div class="card">
         <h3>Bottom-Half</h3>
-        <p>Two tasks at priority 12 measure latency</p>
+        <p>Semaphore path and<br>direct notification path</p>
       </div>
       <div class="card">
-        <h3>Load Test</h3>
-        <p>Optional App-2 tasks to create contention</p>
+        <h3>Measurement</h3>
+        <p>Idle vs loaded<br>latency comparison</p>
       </div>
     </div>
   </section>
 
+  <!-- ========== ARCHITECTURE ========== -->
   <section id="architecture">
     <h2>System Architecture</h2>
+    <p>
+      The diagram below shows the exact control flow used in the code. The ISR is
+      not a FreeRTOS task; it runs in interrupt context. It wakes two ordinary
+      tasks that perform the logging work.
+    </p>
     <pre>
-GPIO 18 (Tamper Button)
-         |
-         v
-+---------------------------------+
-| button_isr (top-half)           |
-| - debounce                      |
-| - record time                   |
-| - pulse GPIO 19                 |
-| - give semaphore                |
-| - direct task notify             |
-+---------------------------------+
-         |                 |
-    semaphore         notification
-         |                 |
-         v                 v
-+---------------+   +----------------+
-| btn_sem task  |   | btn_notif task |
-| priority 12   |   | priority 12    |
-| logs latency  |   | logs latency   |
-+---------------+   +----------------+
+GPIO 18 (Tamper Button / active-low)
+              |
+              |  falling edge
+              v
++------------------------------------------+
+|  button_isr  (IRAM_ATTR, top-half)       |
+|                                          |
+|  1. Debounce check (200 µs gate)         |
+|  2. Record ISR entry time                |
+|  3. Pulse GPIO 19 (for logic analyzer)   |
+|  4. xSemaphoreGiveFromISR                |
+|  5. vTaskNotifyGiveFromISR               |
+|  6. portYIELD_FROM_ISR                   |
++------------------------------------------+
+         |                      |
+         | binary semaphore     | direct task notification
+         v                      v
++-------------------+   +--------------------+
+| btn_sem task      |   | btn_notif task     |
+| priority 12       |   | priority 12        |
+| blocks on sem     |   | blocks on notify   |
+| calculates latency|   | calculates latency |
+| logs result       |   | logs result        |
++-------------------+   +--------------------+
+
+Optional background load (WITH_LOAD = 1)
+----------------------------------------
+load_a  priority 15   (can preempt bottom-half)
+load_b  priority 10
+load_c  priority  5
+load_d  priority  2
     </pre>
   </section>
 
+  <!-- ========== TASK TABLE ========== -->
   <section id="tasks">
     <h2>Task Table</h2>
     <table>
       <tr>
         <th>Task</th>
         <th>Priority</th>
+        <th>Type</th>
         <th>Role</th>
       </tr>
       <tr>
         <td>btn_sem</td>
         <td>12</td>
+        <td>Event-driven</td>
         <td>Bottom-half using binary semaphore</td>
       </tr>
       <tr>
         <td>btn_notif</td>
         <td>12</td>
+        <td>Event-driven</td>
         <td>Bottom-half using direct notification</td>
       </tr>
       <tr>
-        <td>load_a (optional)</td>
+        <td>load_a</td>
         <td>15</td>
-        <td>Background load – can delay bottom-half</td>
+        <td>Periodic (10 ms)</td>
+        <td>Background load – highest priority</td>
       </tr>
       <tr>
         <td>load_b</td>
         <td>10</td>
+        <td>Periodic (20 ms)</td>
         <td>Background load</td>
       </tr>
       <tr>
         <td>load_c</td>
         <td>5</td>
+        <td>Periodic (50 ms)</td>
         <td>Background load</td>
       </tr>
       <tr>
         <td>load_d</td>
         <td>2</td>
+        <td>Periodic (100 ms)</td>
         <td>Background load</td>
       </tr>
     </table>
-  </section>
-
-  <section id="timing">
-    <h2>Timing Evidence</h2>
-    <p><strong>Idle (WITH_LOAD = 0)</strong></p>
-    <ul>
-      <li>Notification max latency: <strong>30 µs</strong></li>
-      <li>Semaphore max latency: <strong>2309 µs</strong></li>
-    </ul>
-    <p><strong>Loaded (WITH_LOAD = 1)</strong></p>
-    <ul>
-      <li>Notification max latency: <strong>17706 µs</strong></li>
-      <li>Semaphore max latency: <strong>10369 µs</strong></li>
-    </ul>
-    <p>
-      Under load the notification path became ~590× slower and the semaphore path
-      became ~4.5× slower. Task A (priority 15) is the main cause of the extra delay.
+    <p style="margin-top:14px;">
+      The two bottom-half tasks only exist to respond to the tamper interrupt.
+      The four load tasks are enabled only when <code>WITH_LOAD = 1</code> and are
+      used to create contention on Core 1.
     </p>
   </section>
 
+  <!-- ========== TIMING / WCET EVIDENCE ========== -->
+  <section id="timing">
+    <h2>Timing Evidence (Latency Measurements)</h2>
+    <p>
+      Because this is an event-driven interrupt system rather than a set of
+      periodic tasks, the key timing metric is <strong>interrupt-to-task latency</strong>
+      (the time from ISR entry until the bottom-half task starts running).
+    </p>
+
+    <p><strong>Idle conditions</strong> (<code>WITH_LOAD = 0</code>)</p>
+    <ul>
+      <li>Direct notification max latency: <strong>30 µs</strong></li>
+      <li>Binary semaphore max latency: <strong>2309 µs</strong></li>
+    </ul>
+
+    <p><strong>Loaded conditions</strong> (<code>WITH_LOAD = 1</code>)</p>
+    <ul>
+      <li>Direct notification max latency: <strong>17 706 µs</strong></li>
+      <li>Binary semaphore max latency: <strong>10 369 µs</strong></li>
+    </ul>
+
+    <p>
+      Under load the notification path became approximately 590× slower and the
+      semaphore path became approximately 4.5× slower. The main cause is
+      <code>load_a</code> running at priority 15, which is higher than the
+      bottom-half tasks (priority 12).
+    </p>
+  </section>
+
+  <!-- ========== HAZARDS ========== -->
   <section id="hazards">
     <h2>Hazard Analysis</h2>
     <div class="cards">
       <div class="card">
         <h3>Delayed Response</h3>
-        <p>A higher-priority load task can delay the bottom-half tasks after the ISR.</p>
+        <p>A higher-priority task (load_a) can run after the ISR and delay the bottom-half tasks, increasing latency.</p>
       </div>
       <div class="card">
         <h3>Lost Events</h3>
-        <p>A binary semaphore can lose presses if the bottom-half is still busy.</p>
+        <p>A binary semaphore does not count. Multiple presses that occur while the bottom-half is still running can be lost.</p>
       </div>
       <div class="card">
         <h3>Missing Yield</h3>
-        <p>Without portYIELD_FROM_ISR the bottom-half may not run immediately.</p>
+        <p>If portYIELD_FROM_ISR is omitted, the woken bottom-half task may not run until the next natural scheduling point.</p>
       </div>
     </div>
   </section>
 
+  <!-- ========== DEMO ========== -->
   <section id="demo">
-    <h2>Demo and Source</h2>
+    <h2>Demo and Source Code</h2>
     <p>
-      The live Wokwi project shows the interrupt, both bottom-half paths, and the
-      latency numbers in the serial monitor.
+      The live Wokwi project demonstrates the full interrupt path, both bottom-half
+      tasks, latency reporting, and the optional background load.
     </p>
     <div class="btn-row">
       <a class="btn" href="https://wokwi.com/projects/468065854653295617" target="_blank">Open Wokwi Project</a>
       <a class="btn" href="README.md">Read Full README</a>
-      <a class="btn" href="main.c">View Source</a>
+      <a class="btn" href="main.c">View Source (main.c)</a>
     </div>
+    <p style="margin-top:20px;">
+      <strong>Demo Video</strong><br>
+      (YouTube link will be added here after the video is uploaded)
+    </p>
   </section>
 
 </main>
